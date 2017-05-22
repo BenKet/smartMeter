@@ -8,33 +8,51 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
+    <!-- Javascript for random number and KhW entry feature -->
     <script>
+
+        //get random number
         function random (min, max) {
             var randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
             return randomNum;
         }
 
+        //write random number
         function randomMaxBurden () {
             var randomNum = random(min, max);
             document.write('<input type="text" class="form-control" readonly="readonly" value=" '+ randomNum +' ">');
         }
 
+        //do a entry (idea from http://www.perl-community.de/bat/poard/thread/16658 )
         function submitEintrag() {
+            //get values from user input
             var nK = document.getElementById("Nuterkennung").value;
             var KhW = document.getElementById("verbrauchswert").value;
+
+            //create timestamp
             var date = new Date();
             var dateString = date.toDateString();
 
-            var tabelle = "tabelle";
-            var table = document.getElementById( tabelle );
-            var zeile = table.getElementsByTagName( "tr" ).length;
-            var tr = table.insertRow( zeile );
+            //get the table by ID
+            var tabelle = document.getElementById( "tabelle" );
+
+            //count already existing rows in the table
+            var zeile = tabelle.getElementsByTagName( "tr" ).length;
+
+            //insert new row in the end (because we counted the number of existing rows and saved it in "zeile")
+            var tr = tabelle.insertRow( zeile );
+
+            //creat three new td elements for one row
             var nutzerKennung = document.createElement( "td" );
             var verbrauchskWh = document.createElement( "td" );
             var timestamps = document.createElement( "td" );
+
+            //insert content from user into the <td> tags
             nutzerKennung.innerHTML = nK;
             verbrauchskWh.innerHTML = KhW;
             timestamps.innerHTML = dateString;
+
+            //insert as a child of the new created row
             tr.appendChild( nutzerKennung );
             tr.appendChild( verbrauchskWh );
             tr.appendChild( timestamps );
@@ -43,74 +61,89 @@
 
     <title>Smart Meter</title>
 </head>
+
 <body>
-<div id="main">
-    <h1>Detailansicht</h1><br>
-    <img id="smartMeterPic" src="img/smartMeter.jpg"></img>
-    <div id="info">
-        <h4>Gerätekennung</h4>
-        <input type="text" class="form-control" readonly="readonly" value="DE 02469237">
-        <br>
-        <h4>Zulässige maximale Belastung</h4>
-        <script>
-            var min = 50;
-            var max = 100;
-            var maxBelastung = random(min, max);
-            document.write('<input type="text" class="form-control" readonly="readonly" value=" '+ maxBelastung +' ">');
-        </script>
-        <br>
-        <h4>Spannung</h4>
-        <script>
-            var min = 220;
-            var max = 240;
-            var spannung = random(min, max);
-            document.write('<input type="text" class="form-control" readonly="readonly" value=" '+ spannung +' ">');
-        </script>
-        <br>
-        <h4>Stromstärke</h4>
-        <script>
-            var min = 0;
-            var max = maxBelastung + 5;
-            var strom = random(min, max);
-            if(strom > maxBelastung){
-                document.write('<input type="text" class="form-control" id="warnung" readonly="readonly" value=" '+ strom +' ">');
-            }else {
-                document.write('<input type="text" class="form-control"  readonly="readonly" value=" ' + strom + ' ">');
-            }
-        </script>
+    <div id="main">
+        <h1>Detailansicht</h1><br>
+
+        <!-- Image of the smartMeter -->
+        <img id="smartMeterPic" src="img/smartMeter.jpg"></img>
+
+        <!-- Info Box with the dates -->
+        <div id="info">
+            <h4>Gerätekennung</h4>
+            <input type="text" class="form-control" readonly="readonly" value="DE 02469237">
+            <br>
+            <h4>Zulässige maximale Belastung</h4>
+            <script>
+                // definition of min and max values
+                var min = 50;
+                var max = 100;
+
+                //get random number
+                var maxBelastung = random(min, max);
+
+                //write random number in an input tag
+                document.write('<input type="text" class="form-control" readonly="readonly" value=" '+ maxBelastung +' ">');
+            </script>
+            <br>
+            <h4>Spannung</h4>
+            <script>
+                // definition of min and max values
+                var min = 220;
+                var max = 240;
+
+                //get random number
+                var spannung = random(min, max);
+
+                //write random number in an input tag
+                document.write('<input type="text" class="form-control" readonly="readonly" value=" '+ spannung +' ">');
+            </script>
+            <br>
+            <h4>Stromstärke</h4>
+            <script>
+                // definition of min and max (+5) values
+                var min = 0;
+                var max = maxBelastung + 5;
+
+                //get random number
+                var strom = random(min, max);
+
+                //check if current strom > max belastung, if true -> warning else normal input
+                if(strom > maxBelastung){
+                    document.write('<input type="text" class="form-control" id="warnung" readonly="readonly" value=" '+ strom +' ">');
+                }else {
+                    document.write('<input type="text" class="form-control"  readonly="readonly" value=" ' + strom + ' ">');
+                }
+            </script>
+        </div>
+
+        <!-- table to list user input -->
+        <div id="ablesen">
+            <table class="table table-striped" id="tabelle">
+                <thead>
+                     <tr>
+                          <th>Nutzerkennung</th>
+                         <th>Verbrauchswert (kWh)</th>
+                          <th>Time</th>
+                      </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MA 51325497</td>
+                        <td>2283,035</td>
+                        <td>Mon May 15 2017</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- form for user input -->
+            <form id="formID" action="" onsubmit="return submitEintrag();" method="POST">
+                Nutzerkennung <input type="text" class="form-control" id="Nuterkennung"><br>
+                Verbrauchswert <input type="text" class="form-control" id="verbrauchswert"><br><br>
+                <input type="button" class="btn btn-success" onclick="submitEintrag()" value="Absenden">
+            </form>
+        </div>
     </div>
-    <div id="ablesen">
-        <table class="table table-striped" id="tabelle">
-            <thead>
-            <tr>
-                <th>Nutzerkennung</th>
-                <th>Verbrauchswert (kWh)</th>
-                <th>Time</th>
-            </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>MA 51325497</td>
-                    <td>2283,035</td>
-                    <td>Mon May 15 2017</td>
-                </tr>
-                <tr>
-                    <td>Mary</td>
-                    <td>2483,035</td>
-                    <td>Fri May 19 2017</td>
-                </tr>
-            </tbody>
-        </table>
-        <form id="formID" action="" onsubmit="return submitEintrag();" method="POST">
-            Nutzerkennung <input type="text" class="form-control" id="Nuterkennung"><br>
-            Verbrauchswert <input type="text" class="form-control" id="verbrauchswert"><br><br>
-            <input type="button" class="btn btn-success" onclick="submitEintrag()" value="Absenden">
-        </form>
-
-
-    </div>
-</div>
-
-
 </body>
 </html>
